@@ -1,48 +1,100 @@
-let mobiles = [];
 
-// Load mobile data
-fetch("mobiles.json")
-  .then(response => response.json())
-  .then(data => {
-    mobiles = data;
-    loadDropdowns();
-  });
+const API_KEY = "5fec79a4c7msh4a9df39095a85a4p14ffbdjsnd4c8ec2dd321";   // 🔴 replace with your NEW key
+const API_HOST = "mobile-phone-specs-database.p.rapidapi.com";
 
-// Load mobiles into dropdown
-function loadDropdowns() {
-    let m1 = document.getElementById("mobile1");
-    let m2 = document.getElementById("mobile2");
 
-    mobiles.forEach(mobile => {
-        let option1 = new Option(mobile.name, mobile.id);
-        let option2 = new Option(mobile.name, mobile.id);
-        m1.add(option1);
-        m2.add(option2);
+window.onload = () => {
+  loadMobilesByBrand("samsung"); // default brand
+};
+
+
+async function loadMobilesByBrand(brand) {
+  const url = `https://mobile-phone-specs-database.p.rapidapi.com/gsm/get-models-by-brand/${brand}`;
+
+  const options = {
+    method: "GET",
+    headers: {
+      "X-RapidAPI-Key": API_KEY,
+      "X-RapidAPI-Host": API_HOST
+    }
+  };
+
+  try {
+    const response = await fetch(url, options);
+    const data = await response.json();
+
+    const m1 = document.getElementById("mobile1");
+    const m2 = document.getElementById("mobile2");
+
+    // clear old options
+    m1.innerHTML = `<option value="">Select Mobile 1</option>`;
+    m2.innerHTML = `<option value="">Select Mobile 2</option>`;
+
+    data.forEach(phone => {
+      m1.add(new Option(phone.name, phone.id));
+      m2.add(new Option(phone.name, phone.id));
     });
+
+  } catch (error) {
+    console.error("Error loading mobiles:", error);
+    alert("Failed to load mobile list");
+  }
 }
 
-// Compare function
-function compareMobiles() {
-    let id1 = document.getElementById("mobile1").value;
-    let id2 = document.getElementById("mobile2").value;
 
-    let mobile1 = mobiles.find(m => m.id == id1);
-    let mobile2 = mobiles.find(m => m.id == id2);
+async function getPhoneSpecs(phoneId) {
+  const url = `https://mobile-phone-specs-database.p.rapidapi.com/gsm/get-specifications-by-phone-custom-id/${phoneId}`;
 
-    let table = document.getElementById("result");
+  const options = {
+    method: "GET",
+    headers: {
+      "X-RapidAPI-Key": API_KEY,
+      "X-RapidAPI-Host": API_HOST
+    }
+  };
 
-    table.innerHTML = `
-      <tr>
-        <th>Specification</th>
-        <th>${mobile1.name}</th>
-        <th>${mobile2.name}</th>
-      </tr>
-      <tr><td>Display</td><td>${mobile1.display}</td><td>${mobile2.display}</td></tr>
-      <tr><td>Processor</td><td>${mobile1.processor}</td><td>${mobile2.processor}</td></tr>
-      <tr><td>RAM</td><td>${mobile1.ram}</td><td>${mobile2.ram}</td></tr>
-      <tr><td>Storage</td><td>${mobile1.storage}</td><td>${mobile2.storage}</td></tr>
-      <tr><td>Camera</td><td>${mobile1.camera}</td><td>${mobile2.camera}</td></tr>
-      <tr><td>Battery</td><td>${mobile1.battery}</td><td>${mobile2.battery}</td></tr>
-      <tr><td>Price</td><td>${mobile1.price}</td><td>${mobile2.price}</td></tr>
-    `;
+  const response = await fetch(url, options);
+  return await response.json();
+}
+
+
+async function compareMobiles() {
+  const id1 = document.getElementById("mobile1").value;
+  const id2 = document.getElementById("mobile2").value;
+
+  if (!id1 || !id2) {
+    alert("Please select two mobiles to compare");
+    return;
+  }
+
+  try {
+    document.getElementById("result").innerHTML =
+      "<tr><td colspan='3'>Loading comparison...</td></tr>";
+
+    const phone1 = await getPhoneSpecs(id1);
+    const phone2 = await getPhoneSpecs(id2);
+
+    showComparison(phone1, phone2);
+
+  } catch (error) {
+    console.error("Comparison error:", error);
+    alert("Failed to fetch mobile specifications");
+  }
+}
+
+function showComparison(p1, p2) {
+  document.getElementById("result").innerHTML = `
+    <tr>
+      <th>Specification</th>
+      <th>${p1.phone_name || "Mobile 1"}</th>
+      <th>${p2.phone_name || "Mobile 2"}</th>
+    </tr>
+    <tr><td>Brand</td><td>${p1.brand}</td><td>${p2.brand}</td></tr>
+    <tr><td>Display</td><td>${p1.display}</td><td>${p2.display}</td></tr>
+    <tr><td>Processor</td><td>${p1.processor}</td><td>${p2.processor}</td></tr>
+    <tr><td>RAM</td><td>${p1.ram}</td><td>${p2.ram}</td></tr>
+    <tr><td>Storage</td><td>${p1.storage}</td><td>${p2.storage}</td></tr>
+    <tr><td>Camera</td><td>${p1.camera}</td><td>${p2.camera}</td></tr>
+    <tr><td>Battery</td><td>${p1.battery}</td><td>${p2.battery}</td></tr>
+  `;
 }
