@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "name": "Samsung Galaxy A15",
+    "display": "6.5 inch AMOLED",
+    "processor": "Exynos",
+    "ram": "6 GB",
+    "storage": "128 GB",
+    "camera": "50 MP",
+    "battery": "5000 mAh",
+    "price": "₹15,000"
+  },
+  {
+    "id": 2,
+    "name": "Redmi Note 13",
+    "display": "6.6 inch LCD",
+    "processor": "Snapdragon",
+    "ram": "8 GB",
+    "storage": "128 GB",
+    "camera": "64 MP",
+    "battery": "5100 mAh",
+    "price": "₹14,500"
+  },
+  {
+    "id": 3,
+    "name": "Realme Narzo 60",
+    "display": "6.43 inch AMOLED",
+    "processor": "Dimensity",
+    "ram": "6 GB",
+    "storage": "128 GB",
+    "camera": "64 MP",
+    "battery": "5000 mAh",
+    "price": "₹16,000"
+  }
+]
