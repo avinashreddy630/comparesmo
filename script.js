@@ -98,3 +98,4 @@ function showComparison(p1, p2) {
     <tr><td>Battery</td><td>${p1.battery}</td><td>${p2.battery}</td></tr>
   `;
 }
+
